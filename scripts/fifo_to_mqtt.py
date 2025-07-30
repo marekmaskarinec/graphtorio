@@ -36,11 +36,14 @@ try:
     while True:
         select.select([file], [], [file])
         data = file.read()
-        data = data.strip().split("\t")
-        if len(data) != 2:
+        if len(data) == 0:
             continue
-        print(data)
-        client.publish(data[0], data[1])
+        for l in data.split('\n'):
+            l = l.strip().split("\t")
+            if len(l) != 2:
+                continue
+            print(l)
+            client.publish(l[0], l[1])
 except Exception as ex:
     print(str(ex))
     signal_handler(None, None)
