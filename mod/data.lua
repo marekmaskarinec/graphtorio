@@ -1,7 +1,12 @@
 
+local tint = { r = 1, g = 0.6, b = 0.2, a = 1 }
+
 local building = table.deepcopy(data.raw["lamp"]["small-lamp"])
 
 building.name = "observer"
+building.minable.result = "observer"
+building.picture_off.layers[1].tint = tint
+building.picture_on.tint = tint
 
 local item = table.deepcopy(data.raw["item"]["small-lamp"])
 
@@ -11,7 +16,7 @@ item.icons = {
 	{
 		icon = item.icon,
 		icon_size = item.icon_size,
-		tint = { r = 0.2, g = 1, b = 0.2, a = 1 }
+		tint = tint
 	}
 }
 building.icons = item.icons
