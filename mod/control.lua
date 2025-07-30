@@ -2,12 +2,12 @@
 local function get_network_ids(entity)
     local networks = {}
 
-    for WireConnectorID, WireConnector in pairs(entity.get_wire_connectors()) do
+    for wire_connector_id, wire_connector in pairs(entity.get_wire_connectors()) do
         -- Filter out copper wire and empty connections
-        if  WireConnector.network_id ~= nil and
-            WireConnector.wire_type ~= 1 and
-            WireConnector.real_connection_count  > 0 then
-                table.insert(networks, WireConnector.network_id)
+        if  wire_connector.network_id ~= nil and
+            wire_connector.wire_type ~= 1 and
+            wire_connector.real_connection_count  > 0 then
+                table.insert(networks, wire_connector.network_id)
         end
     end
 
@@ -18,15 +18,15 @@ end
 local function get_wired_entities(entity)
     local entities = {}
 
-    for WireConnectorID, WireConnector in pairs(entity.get_wire_connectors()) do
+    for wire_connector_id, wire_connector in pairs(entity.get_wire_connectors()) do
         -- Check if entity is connected to a circuit network
-        local network = entity.get_circuit_network(WireConnectorID)
+        local network = entity.get_circuit_network(wire_connector_id)
 
         -- Check for all directly connected entities
         -- TODO: Filter out ghosts
         if network then
-            for _, WireConnection in ipairs(WireConnector.connections) do
-                table.insert(entities, WireConnection.target.owner)
+            for _, wire_connection in ipairs(wire_connector.connections) do
+                table.insert(entities, wire_connection.target.owner)
             end
         end
     end
