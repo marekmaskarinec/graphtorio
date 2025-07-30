@@ -1,6 +1,6 @@
 
 local function pub_data(topic, data)
-	helpers.write_file("out.json", topic .. ":" .. helpers.table_to_json(data) .. "\n", true)
+	helpers.write_file("out.json", topic .. "\t" .. helpers.table_to_json(data) .. "\n", true)
 end
 
 script.on_event(defines.events.on_gui_opened,
