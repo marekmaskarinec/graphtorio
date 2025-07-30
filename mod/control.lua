@@ -1,3 +1,19 @@
+-- Returns the network ids the entity is connected to
+local function get_network_ids(entity)
+    local networks = {}
+
+    for WireConnectorID, WireConnector in pairs(entity.get_wire_connectors()) do
+        -- Filter out copper wire and empty connections
+        if  WireConnector.network_id ~= nil and
+            WireConnector.wire_type ~= 1 and
+            WireConnector.real_connection_count  > 0 then
+                table.insert(networks, WireConnector.network_id)
+        end
+    end
+
+    return networks
+end
+
 -- Returns all entities directly connected by circuit wires
 local function get_wired_entities(entity)
     local entities = {}
@@ -20,7 +36,13 @@ end
 
 -- Returns all entities connected on the same circuit network
 local function get_networked_entities(entity)
-    local entities = {}
+    local entities = get_wired_entities(entity)
+
+    -- Get a list of networks the entity is connected to
+    local networks = {}
+    for _, network_id in ipairs(get_network_ids(entity)) do
+        networks[network_id] = true
+    end
 
     -- Do a DFS through wire connections
     local added_entities = {[entity.unit_number] = true}
@@ -36,10 +58,13 @@ local function get_networked_entities(entity)
             if added_entities[wired_entity.unit_number] ~= true then
                 added_entities[wired_entity.unit_number] = true
                 
-                -- TODO: Get network ids of connected entity
-
-                table.insert(entities_to_process, wired_entity)
-                table.insert(entities, wired_entity)
+                for _, network_id in ipairs(get_network_ids(wired_entity)) do
+                    if networks[network_id] then
+                        table.insert(entities_to_process, wired_entity)
+                        table.insert(entities, wired_entity)
+                        break
+                    end
+                end
             end
         end
     end
