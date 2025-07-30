@@ -15,3 +15,51 @@ script.on_event(defines.events.on_gui_opened,
 	end
 )
 
+local belt = {}
+
+script.on_event(defines.events.on_tick,
+	function(ev)
+		local player = game.players[1]
+		local selected = player.selected
+
+		if selected == nil then return end
+		if selected.type ~= "transport-belt" then return end
+
+		local function build_item_table(ent)
+			local items_in = ent.get_transport_line(1).get_detailed_contents()
+			for _,v in ipairs(ent.get_transport_line(2).get_detailed_contents()) do
+				table.insert(items_in, v)
+			end
+
+			local items = {}
+			for _,item in ipairs(items_in) do
+				items[item.unique_id] = item.stack
+			end
+
+			return items
+		end
+
+		local items = build_item_table(selected)
+
+		if belt.unit_number ~= selected.unit_number then
+			belt.unit_number = selected.unit_number
+			belt.items = items
+			belt.moved = 0
+		end
+
+		for id,_ in pairs(belt.items) do
+			if items[id] == nil then
+				belt.moved = belt.moved + 1
+			end
+		end
+
+		belt.items = items
+	end)
+
+script.on_nth_tick(60,
+	function (ev)
+		if belt.moved == nil then return end
+
+		game.print(belt.moved)
+		belt.moved = 0
+	end)
