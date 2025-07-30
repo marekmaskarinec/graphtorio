@@ -64,7 +64,6 @@ script.on_nth_tick(60,
 	function (ev)
 		if belt.moved == nil then return end
 
-		game.print(belt.moved)
 		pub_data("belt/" .. tostring(belt.unit_number) .. "/moved", { value = belt.moved })
 		belt.moved = 0
 	end)
