@@ -74,6 +74,32 @@ local function get_networked_entities(entity)
     return entities
 end
 
+-- Returns only entities of the given type
+local function filter_entities_by_type(entities, type)
+	local filtered = {}
+
+	for _, entity in pairs(entities) do
+		if entity.type == type then
+			table.insert(filtered, entity)
+		end
+	end
+
+	return filtered
+end
+
+-- Returns only entities of the prototype name
+local function filter_entities_by_name(entities, name)
+	local filtered = {}
+
+	for _, entity in pairs(entities) do
+		if entity.name == name then
+			table.insert(filtered, entity)
+		end
+	end
+
+	return filtered
+end
+
 -- The pub data is buffered because sometimes the game drops data when calling
 -- multiple writes per tick.
 local g_pub_buffer = ""
@@ -202,5 +228,4 @@ script.on_event(defines.events.on_selected_entity_changed,
             game.print(entity)
 			log(entity)
         end
-    end
-)
+    end)
