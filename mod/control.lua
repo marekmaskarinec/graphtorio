@@ -1,3 +1,5 @@
+local discover = require('discover')
+
 -- Returns the network ids the entity is connected to
 local function get_network_ids(entity)
     local networks = {}
@@ -91,7 +93,6 @@ end
 local function update_observer_data(observer)
 	local data = {}
 	data.networked_ents = get_networked_entities(observer)
-	game.print(#data.networked_ents)
 	data.wired_ents = get_wired_entities(observer)
 	data.belts = {}
 	for i,ent in ipairs(data.networked_ents) do
@@ -101,6 +102,15 @@ local function update_observer_data(observer)
 				unit_number = ent.unit_number,
 				moved = 0
 			}
+
+			game.print("out")
+			for _,tl in ipairs(ent.get_transport_line(1).output_lines) do
+				game.print(tl.owner)
+			end
+			game.print("in")
+			for _,tl in ipairs(ent.get_transport_line(1).input_lines) do
+				game.print(tl.owner)
+			end
 		end
 	end
 
