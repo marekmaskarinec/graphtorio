@@ -3,8 +3,6 @@ local potential = {}
 function potential.calculate(ents)
 	local items = {}
 
-	local furnace_count = 0
-
 	for _, e in ipairs(ents) do
 		if e.type == "assembling-machine" or e.type == "furnace" then
 			local rec = e.get_recipe()
@@ -34,10 +32,8 @@ function potential.calculate(ents)
 				end
 			end
 			::continue::
-		end
+		end -- TODO: handle mining drills here
 	end
-
-	game.print(furnace_count)
 
 	return items
 end
