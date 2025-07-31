@@ -34,6 +34,8 @@ local function get_wired_entities(entity)
 end
 
 local function get_networked_entities(entity)
+	if entity.unit_number == nil then return {} end
+
     local entities = get_wired_entities(entity)
 
     -- Get a list of networks the entity is connected to
