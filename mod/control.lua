@@ -33,7 +33,6 @@ local function get_wired_entities(entity)
     return entities
 end
 
--- TODO: This function can return duplicit entities
 local function get_networked_entities(entity)
     local entities = get_wired_entities(entity)
 
@@ -45,7 +44,11 @@ local function get_networked_entities(entity)
 
     -- Do a DFS through wire connections
     local added_entities = {[entity.unit_number] = true}
+	
     local entities_to_process = get_wired_entities(entity)
+	for _, entity in ipairs(entities_to_process) do
+		added_entities[entity.unit_number] = true
+	end
 
     while #entities_to_process > 0 do
         -- Get entities directly connected by wire
@@ -187,3 +190,17 @@ script.on_nth_tick(60,
 			end
 		end
 	end)
+
+script.on_event(defines.events.on_selected_entity_changed,
+    function (event)
+        local player = game.players[event.player_index]
+        if player.selected == nil then return end
+
+        local networked_entities = get_networked_entities(player.selected)
+		game.print(#networked_entities)
+        for id, entity in ipairs(networked_entities) do
+            game.print(entity)
+			log(entity)
+        end
+    end
+)
