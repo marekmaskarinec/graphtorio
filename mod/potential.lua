@@ -7,7 +7,12 @@ function potential.calculate(ents)
 		if e.type == "assembling-machine" or e.type == "furnace" then
 			local rec = e.get_recipe()
 			if rec == nil then
-				goto continue
+				if e.previous_recipe.name ~= nil then
+					-- WTF?????????????
+					rec = game.players[1].force.recipes[e.previous_recipe.name.name]
+				else
+					rec = game.players[1].force.recipes[e.previous_recipe]
+				end
 			end
 			local duration = rec.energy / e.crafting_speed
 
@@ -31,7 +36,6 @@ function potential.calculate(ents)
 					end
 				end
 			end
-			::continue::
 		end -- TODO: handle mining drills here
 	end
 
