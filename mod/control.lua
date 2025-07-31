@@ -104,17 +104,10 @@ local function update_observer_data(observer)
 			data.belts[#data.belts + 1] = {
 				ent = ent,
 				unit_number = ent.unit_number,
+				inputs = discover.discover(ent, true),
+				outputs = discover.discover(ent, false),
 				moved = 0,
 			}
-
-			game.print("out")
-			for _, tl in ipairs(ent.get_transport_line(1).output_lines) do
-				game.print(tl.owner)
-			end
-			game.print("in")
-			for _, tl in ipairs(ent.get_transport_line(1).input_lines) do
-				game.print(tl.owner)
-			end
 		end
 	end
 
