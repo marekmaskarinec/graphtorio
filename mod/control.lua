@@ -1,4 +1,5 @@
 local discover = require("discover")
+local potential = require("potential")
 
 -- Returns the network ids the entity is connected to
 local function get_network_ids(entity)
@@ -136,6 +137,11 @@ local function update_observer_data(observer)
 				outputs = discover.discover(ent, false),
 				moved = 0,
 			}
+
+			local outputs = potential.calculate(data.belts[#data.belts].outputs)
+			pub_data("potential/" .. ent.unit_number .. "/outputs", outputs)
+			local inputs = potential.calculate(data.belts[#data.belts].inputs)
+			pub_data("potential/" .. ent.unit_number .. "/inputs", inputs)
 		end
 	end
 
