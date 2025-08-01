@@ -1,3 +1,5 @@
+local ore = require("ore")
+
 local potential = {}
 
 function potential.calculate(ents)
@@ -7,12 +9,7 @@ function potential.calculate(ents)
 		if e.type == "assembling-machine" or e.type == "furnace" then
 			local rec = e.get_recipe()
 			if rec == nil then
-				if e.previous_recipe.name ~= nil then
-					-- WTF?????????????
-					rec = game.players[1].force.recipes[e.previous_recipe.name.name]
-				else
-					rec = game.players[1].force.recipes[e.previous_recipe]
-				end
+				goto continue
 			end
 			local duration = rec.energy / e.crafting_speed
 
@@ -36,7 +33,18 @@ function potential.calculate(ents)
 					end
 				end
 			end
-		end -- TODO: handle mining drills here
+			::continue::
+		end
+
+		if e.type == "mining-drill" then
+			local stats = ore.get_miner_statistics(e)
+
+			if items[stats.output_resource] == nil then
+				items[stats.output_resource] = 0
+			end
+
+			items[stats.output_resource] = items[stats.output_resource] + stats.output_speed
+		end
 	end
 
 	return items
