@@ -1,6 +1,7 @@
 local discover = require("discover")
 local potential = require("potential")
 local ore = require("ore")
+local utils = require("utils")
 
 -- Returns the network ids the entity is connected to
 local function get_network_ids(entity)
@@ -80,32 +81,6 @@ local function get_networked_entities(entity)
 	end
 
 	return entities
-end
-
--- Returns only entities of the given type
-local function filter_entities_by_type(entities, type)
-	local filtered = {}
-
-	for _, entity in pairs(entities) do
-		if entity.type == type then
-			table.insert(filtered, entity)
-		end
-	end
-
-	return filtered
-end
-
--- Returns only entities of the prototype name
-local function filter_entities_by_name(entities, name)
-	local filtered = {}
-
-	for _, entity in pairs(entities) do
-		if entity.name == name then
-			table.insert(filtered, entity)
-		end
-	end
-
-	return filtered
 end
 
 -- The pub data is buffered because sometimes the game drops data when calling
