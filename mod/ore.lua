@@ -83,8 +83,13 @@ function ore.get_miner_statistics(miner)
 
 	stats.output_speed = stats.mining_speed + stats.productivity
 	
-	stats.output_resource = miner.mining_target.prototype.mineable_properties.products[1].name
-	stats.expected_resources = ore.calculate_total(ore.get_ore_in_range(miner))
+	if miner.mining_target ~= nil then
+		stats.output_resource = miner.mining_target.prototype.mineable_properties.products[1].name
+		stats.expected_resources = ore.calculate_total(ore.get_ore_in_range(miner))
+	else
+		stats.output_resource = nil
+		stats.expected_resources = 0
+	end
 
 	return stats
 end

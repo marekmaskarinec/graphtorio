@@ -39,11 +39,13 @@ function potential.calculate(ents)
 		if e.type == "mining-drill" then
 			local stats = ore.get_miner_statistics(e)
 
-			if items[stats.output_resource] == nil then
-				items[stats.output_resource] = 0
+			if stats.output_resource ~= nil then
+				if items[stats.output_resource] == nil then
+					items[stats.output_resource] = 0
+				end
+	
+				items[stats.output_resource] = items[stats.output_resource] + stats.output_speed
 			end
-
-			items[stats.output_resource] = items[stats.output_resource] + stats.output_speed
 		end
 	end
 
