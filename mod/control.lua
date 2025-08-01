@@ -107,49 +107,6 @@ local function filter_entities_by_name(entities, name)
 	return filtered
 end
 
--- Gets all entities in a patch the given entity is in
-local function get_ore_patch(entity)
-	local function get_neighbors(position, surface, type)
-		local directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
-		local neighbors = {}
-
-		for _, dir in ipairs(directions) do
-			local pos = {position.x + dir[1], position.y + dir[2]}
-			local neighbor = surface.find_entity(type, pos)
-
-			if neighbor ~= nil then table.insert(neighbors, neighbor) end
-		end
-
-		return neighbors
-	end
-
-	local entities = {entity}
-	local entities_to_process = {entity}
-	local added_entities = {[entity.gps_tag] = true}
-
-	while #entities_to_process > 0 do
-		-- Get neighboring ore entities
-		local entity_to_process = table.remove(entities_to_process)
-		local neighbors = get_neighbors(
-			entity_to_process.position,
-			entity_to_process.surface,
-			entity_to_process.prototype.mineable_properties.products[1].name
-		)
-
-		table.insert(entities, entity_to_process)
-
-		for _, neighbor in ipairs(neighbors) do
-			-- Check if entity was not processed
-			if added_entities[neighbor.gps_tag] ~= true then
-				added_entities[neighbor.gps_tag] = true
-
-				table.insert(entities_to_process, neighbor)
-			end
-		end
-	end
-	return entities
-end
-
 -- The pub data is buffered because sometimes the game drops data when calling
 -- multiple writes per tick.
 local g_pub_buffer = ""
@@ -178,7 +135,8 @@ local function update_observer_data(observer)
 				unit_number = ent.unit_number,
 				inputs = discover.discover(ent, true),
 				outputs = discover.discover(ent, false),
-				moved = 0,
+				items = {},
+				moved = {},
 			}
 
 			local outputs = potential.calculate(data.belts[#data.belts].outputs)
@@ -223,7 +181,7 @@ local function belts_on_tick_handler()
 
 		local items = {}
 		for _, item in ipairs(items_in) do
-			items[item.unique_id] = item.stack
+			items[item.unique_id] = { name = item.stack.name, count = item.stack.count }
 		end
 
 		return items
@@ -236,9 +194,12 @@ local function belts_on_tick_handler()
 			belt.items = items
 		end
 
-		for id, _ in pairs(belt.items) do
+		for id, item in pairs(belt.items) do
 			if items[id] == nil then
-				belt.moved = belt.moved + 1
+				if belt.moved[item.name] == nil then
+					belt.moved[item.name] = 0
+				end
+				belt.moved[item.name] = belt.moved[item.name] + item.count
 			end
 		end
 
@@ -264,8 +225,8 @@ script.on_nth_tick(60, function(ev)
 	end
 
 	local function handle_belt(belt)
-		pub_data("belt/" .. tostring(belt.unit_number) .. "/moved", { value = belt.moved, tick = game.tick })
-		belt.moved = 0
+		pub_data("belt/" .. tostring(belt.unit_number) .. "/moved", belt.moved)
+		belt.moved = {}
 	end
 
 	for _, data in pairs(storage.observer_data) do
@@ -275,18 +236,16 @@ script.on_nth_tick(60, function(ev)
 	end
 end)
 
-script.on_event(defines.events.on_selected_entity_changed,
-    function (event)
-        local player = game.players[event.player_index]
-        if player.selected == nil then return end
+script.on_event(defines.events.on_selected_entity_changed, function(event)
+	local player = game.players[event.player_index]
+	if player.selected == nil then
+		return
+	end
 
-		local miners = filter_entities_by_type(get_networked_entities(player.selected), "mining-drill")
-
-		for _, miner in pairs(miners) do
-			get_ore_patch(miner.mining_target)
-			-- game.print("Statistics of a mineable entity")
-			-- game.print(miner.mining_target)
-			-- game.print(miner.mining_target.amount)
-			-- game.print(miner.mining_target.prototype.mineable_properties.products[1].name)
-		end
-	end)
+	local networked_entities = get_networked_entities(player.selected)
+	game.print(#networked_entities)
+	for id, entity in ipairs(networked_entities) do
+		game.print(entity)
+		log(entity)
+	end
+end)
