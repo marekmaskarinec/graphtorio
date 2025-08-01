@@ -101,6 +101,7 @@ end
 
 local function update_observer_data(observer)
 	local data = {}
+	data.ent = observer
 	data.networked_ents = get_networked_entities(observer)
 	data.wired_ents = get_wired_entities(observer)
 	data.belts = {}
@@ -182,9 +183,23 @@ local function belts_on_tick_handler()
 		belt.items = items
 	end
 
+	for unit_number,data in pairs(storage.observer_data) do
+		if data.ent and data.ent.valid == false then
+			game.print(unit_number)
+			storage.observer_data[unit_number] = nil
+		end
+	end
+
 	for _, data in pairs(storage.observer_data) do
-		for _, belt in ipairs(data.belts) do
-			handle_belt(belt)
+		local i = 1
+		while i <= #data.belts do
+			local belt = data.belts[i]
+			if belt.ent.valid == false then
+				table.remove(data.belts, i)
+			else
+				handle_belt(belt)
+				i = i + 1
+			end
 		end
 	end
 end
@@ -207,7 +222,9 @@ script.on_nth_tick(60, function(ev)
 
 	for _, data in pairs(storage.observer_data) do
 		for _, belt in ipairs(data.belts) do
-			handle_belt(belt)
+			if belt.ent.valid == true then
+				handle_belt(belt)
+			end
 		end
 	end
 end)
