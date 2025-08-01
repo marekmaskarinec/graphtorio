@@ -140,9 +140,9 @@ local function update_observer_data(observer)
 			}
 
 			local outputs = potential.calculate(data.belts[#data.belts].outputs)
-			pub_data("potential/" .. ent.unit_number .. "/outputs", outputs)
+			pub_data("belt/" .. ent.gps_tag .. "/potential_outputs", outputs)
 			local inputs = potential.calculate(data.belts[#data.belts].inputs)
-			pub_data("potential/" .. ent.unit_number .. "/inputs", inputs)
+			pub_data("belt/" .. ent.gps_tag .. "/potential_inputs", inputs)
 		end
 	end
 
@@ -225,7 +225,7 @@ script.on_nth_tick(60, function(ev)
 	end
 
 	local function handle_belt(belt)
-		pub_data("belt/" .. tostring(belt.unit_number) .. "/moved", belt.moved)
+		pub_data("belt/" .. belt.ent.gps_tag .. "/moved", belt.moved)
 		belt.moved = {}
 	end
 
