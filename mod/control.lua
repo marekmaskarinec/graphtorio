@@ -1,5 +1,6 @@
 local discover = require("discover")
 local potential = require("potential")
+local ore = require("ore")
 
 -- Returns the network ids the entity is connected to
 local function get_network_ids(entity)
@@ -233,19 +234,5 @@ script.on_nth_tick(60, function(ev)
 		for _, belt in ipairs(data.belts) do
 			handle_belt(belt)
 		end
-	end
-end)
-
-script.on_event(defines.events.on_selected_entity_changed, function(event)
-	local player = game.players[event.player_index]
-	if player.selected == nil then
-		return
-	end
-
-	local networked_entities = get_networked_entities(player.selected)
-	game.print(#networked_entities)
-	for id, entity in ipairs(networked_entities) do
-		game.print(entity)
-		log(entity)
 	end
 end)
